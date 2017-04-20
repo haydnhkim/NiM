@@ -207,19 +207,26 @@ ngApp
                 clearInterval(timeout);
             }
             $scope.settings.checkIntervalTimeout = setInterval(function() {
-                if ($scope.settings.auto && ! $scope.lock) {
-                    if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
-                    closeDevTools(
-                    $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
-                        $scope.message += '<br>' + message;
-                    }));
-                } else if ($scope.settings.auto && $scope.lock) {
-                    /** If the $scope.lock is set then we still have to check for disconnects on the client side via httpGetTest().
-                    until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
-                    that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
-                    */
-                    SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
-                }
+                $scope.devToolsSessions.forEach(function(devToolsSession, index) {
+                    if ($scope.settings.auto && ! $scope.lock) {
+                        if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
+                        closeDevTools(
+                        $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
+                            $scope.message += '<br>' + message;
+                        }));
+                    } else if ($scope.settings.auto && $scope.lock) {
+                        /** If the $scope.lock is set then we still have to check for disconnects on the client side via httpGetTest().
+                        until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
+                        that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
+                        */
+                        SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
+                    }
+                });
+                $scope.sessionlessTabs.forEach(function(sessionlessTab, index) {
+                    if (sessionlessTab.auto) {
+                        $scope.openTab(sessionlessTab.host, sessionlessTab.port, function() {});
+                    }
+                });
             }, $scope.settings.checkInterval);
         }
         function httpGetTestSingleton() {
@@ -598,6 +605,11 @@ ngApp
                 if (index === -1) index = 0;
                 tabId_HostPort_LookupTable[index] = { host: host, port: port, id: id };
             }
+        }
+        $scope.saveSessionlessTabState = function(tabToSave) {
+            $scope.sessionlessTabs.find(function(tab, index, tabs) {
+                if (tab.id === tabToSave.id) return tabs.splice(index, 1, tab);
+            });
         }
         function write(key, obj) {
             chrome.storage.sync.set({

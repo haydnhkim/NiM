@@ -20,7 +20,28 @@ background-color:#e8f5e9;
 .switch label input[type=checkbox]:checked+.lever:after {
 background-color:#4caf50;
 }
-
+body > div.container.container-page > div:nth-child(2) > div.col.s11.m12.l12 {
+    max-height: 340px;
+}
+.autoIncrementSelect {
+    display: inline;
+    padding: 0;
+    background-image: none;
+    height: 22px;
+}
+.invalidInput {
+    color: red;
+}
+#add-tab-button {
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-left: 2px;
+}
+#open-devtools-button {
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-right: 2px;
+}
 div.container.footer-text {
     width: 80%;
 }
@@ -326,5 +347,65 @@ td.active-cell {
 #modal2 > div.modal-content > div.page-header > h3 {
     font-size: 26px !important;
 }
+#md-newbutton-tab:parent {
+    padding: 0;
+    background-color: #eee;
+}
+#md-newbutton-tab {
+    min-width: 0;
+    margin: 0;
+    float: right;
+    margin-right: 10px !important;
+    background-color: #eee;
+}
+md-tab-item:nth-child(1) {
+    background-color: #e8f5e9 /* green lighten-5 */
+}
+md-tab-item:nth-child(2) {
+    background-color: #c8e6c9 /* green lighten-4 */
+}
+md-tab-item:nth-child(3) {
+    background-color: #a5d6a7 /* green lighten-3 */
+}
+md-tab-item:nth-child(4) {
+    background-color: #81c784 /* green lighten-2 */
+}
 
+md-tab-item:nth-child(5) {
+    background-color: #e8f5e9 /* green lighten-5 */
+}
+md-tab-item:nth-child(6) {
+    background-color: #c8e6c9 /* green lighten-4 */
+}
+md-tab-item:nth-child(7) {
+    background-color: #a5d6a7 /* green lighten-3 */
+}
+md-tab-item:nth-child(8) {
+    background-color: #81c784 /* green lighten-2 */
+}
+
+
+.md-ripple-container {
+    color: #4CAF50;
+}
+md-tab-item {
+    background-color: #eee;
+}
+md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
+    color: #4CAF50;
+    background: #4CAF50;
+}
+.tab-close-x {
+    min-width: 0px !important;
+    padding: 0;
+    position: absolute;
+    top: 2px;
+    right: 4px;
+}
+md-tab-content {
+  transition: opacity .25s linear;
+}
+.tab-title {
+    text-transform: none;
+}
 }
