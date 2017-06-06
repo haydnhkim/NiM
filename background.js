@@ -148,10 +148,11 @@ ngApp
                                         .then(callback);
                                     } else {
                                         // If the tab has focus then issue this... otherwise wait until it has focus (ie event listener for window event.  If another request comes in while waiting, just update the request with the new info but still wait if focus is not present.
-                                        var promiseToUpdateTabOrWindow = new Promise(function(resolve) {
+                                        var promiseToUpdateTabOrWindow = new Promise(function(resolve, reject) {
                                             chrome.tabs.query({
                                                 url: [ 'chrome-devtools://*/*', 'https://chrome-devtools-frontend.appspot.com/*' + host + ':' + port + '*' ]
                                             }, function callback(tab) {
+                                                if (tab.length === 0) return reject();
                                                 // Resolve otherwise let the event handler resolve
                                                 tab = tab[0];
                                                 if (tab.active) {

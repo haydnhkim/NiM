@@ -105,8 +105,8 @@ ngApp
           $scope.bg.devToolsSessions.forEach(function(session) {
             addTab(new Tab({ session: session }));
           });
-          $scope.bg.sessionlessTabs.forEach(function(tab) {
-            addTab(tab);
+          $scope.bg.sessionlessTabs.forEach(function(sessionlessTab) {     
+            addTab(sessionlessTab);
           });
           if ($scope.tabs.length === 0) {
             $scope.bg.sessionlessTabs.push(new Tab());
