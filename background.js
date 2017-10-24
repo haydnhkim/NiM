@@ -725,7 +725,7 @@ ngApp
                                 title: 'NiM owns the (' + shortcut.shortcut + ') shortcut.',
                                 message: '"' + shortcut.description + '"',
                                 buttons: [ { title: 'Disable this notice.' }, { title: 'Change the shortcut.' } ]
-                            },  function(notificationId) {});
+                            },  function() {});
                         });
                     }
                     $window._gaq.push(['_trackEvent', 'User Event', 'OpenDevTools', 'Keyboard Shortcut Used', undefined, true]);
