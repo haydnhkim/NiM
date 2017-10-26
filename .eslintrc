@@ -3,18 +3,6 @@
     "ecmaFeatures": {},
     "plugins": [ "json", "angular" ],
     "globals": {
-<<<<<<< HEAD
-    "angular": true,
-    "module": false,
-    "require": false,
-    "setTimeout": true,
-    "setInterval": true,
-    "clearTimeout": true,
-    "clearInterval": false,
-    "console": false,
-  "process": false,
-},
-=======
         "angular": true,
         "module": false,
         "require": false,
@@ -26,7 +14,6 @@
         "console": false,
         "process": false,
     },
->>>>>>> bitbucket
   "env": { "es6": true },
     "rules": {
         "no-alert": "off",

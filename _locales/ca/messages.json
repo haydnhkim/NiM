@@ -1,14 +1,14 @@
 {
   "donationModalHeader": {
-    "message": "Donasjoner Verdsatt",
+    "message": "Les donacions són apreciades",
     "description": "Donation modal header."
   },
   "noNotifications": {
-    "message": "Det finnes ingen varsler.",
+    "message": "No hi ha notificacions.",
     "description": "Message to display when there are no notifications."
   },
   "appName": {
-    "message": "NIM (Node Inspektør Manager)",
+    "message": "NIM (Node Inspector Manager)",
     "description": "The title of the extension displayed in the web store."
   },
   "appShortName": {
@@ -16,47 +16,47 @@
     "description": "The short title."
   },
   "appDescription": {
-    "message": "Extension for automatisk lansere V8 Inspektør for Node.js feilsøking",
+    "message": "Extensió par a la apertura automàtica d'un inspector (ChromeDevtools V8) per Node.js (node --inspect).",
     "description": "A description of the extension displayed in the web store."
   },
   "pageOptionsTitle": {
-    "message": "NIM (Node Inspektør Manager) - Valg Siden",
+    "message": "NIM (Node Inspector Manager) - Página de opcions",
     "description": "Title shown on options page."
   },
   "defaultTitle": {
-    "message": "NIM (Node Inspektør Manager)",
+    "message": "NIM (Node Inspector Manager)",
     "description": "Title shown in tooltip."
   },
   "errMsg1": {
-    "message": "Feil innstilling avinstallere URL: ",
+    "message": "Error configurant la URL de desinstal·lació: ",
     "description": "Error message."
   },
   "errMsg2": {
-    "message": "Lukket fane for DevTools økt: ",
+    "message": "Pestanya tancada par a la sessió de DevTools: ",
     "description": "Error message."
   },
   "errMsg6": {
-    "message": "Lukket vinduet for DevTools økt: ",
+    "message": "Finestra tancada par a la sessió de DevTools: ",
     "description": "Error message."
   },
   "errMsg3": {
-    "message": "Feilmelding når du prøver å automatisk lukke ",
+    "message": "Error al intentar tancar automàticament",
     "description": "Error message."
   },
   "errMsg4": {
-    "message": "Tilkobling til DevTools host ble avbrutt. Sjekk din vert og port.",
+    "message": "Connexió al servidor DevTools avortada. Comprovi el host y el port.",
     "description": "Error message."
   },
   "errMsg5": {
-    "message": "DevTools er allerede åpen.",
+    "message": "DevTools ja està obert.",
     "description": "Error message."
   },
   "errMsg7": {
-    "message": "DevTools er allerede åpen.",
+    "message": "DevTools ja està obert.",
     "description": "Error message."
   },
   "errMsg8": {
-    "message": "DevTools er allerede åpen.",
+    "message": "DevTools ja està obert.",
     "description": "Storage key $key$ in namespace $namespace$ changed.  Old value was $oldvalue$, new value is $newvalue$",
     "placeholders": {
       "key": {
@@ -78,11 +78,11 @@
     "description": "Port."
   },
   "host": {
-    "message": "Vertsnavn",
+    "message": "Nom de host",
     "description": "Host."
   },
   "manual": {
-    "message": "Manuell",
+    "message": "Manual",
     "description": "Manual."
   },
   "auto": {
@@ -90,83 +90,83 @@
     "description": "Auto."
   },
   "donate": {
-    "message": "Doner",
+    "message": "Donar",
     "description": "Donate."
   },
   "enabled": {
-    "message": "Aktivert",
+    "message": "Activat",
     "description": "Enabled."
   },
   "uptime": {
-    "message": "Oppetid",
+    "message": "El temps d'activitat",
     "description": "Uptime."
   },
   "options": {
-    "message": "Valg",
+    "message": "Opcions",
     "description": "Options."
   },
   "general": {
-    "message": "Generelt",
+    "message": "General",
     "description": "General."
   },
   "on": {
-    "message": "På",
+    "message": "Activat",
     "description": "On."
   },
   "off": {
-    "message": "Av",
+    "message": "Desactivat",
     "description": "Off."
   },
   "openInspectorNewWindow": {
-    "message": "Åpne i et Nytt Vindu.",
+    "message": "Obrir en una nova finestra.",
     "description": "Open Inspector in a new window."
   },
   "makeInspectorWindowFocused": {
-    "message": "Gjør Vinduet I Fokus.",
+    "message": "Fer que la finestra es posi en primer pla.",
     "description": "Make Inspector window focused."
   },
   "makeInspectorTabActive": {
-    "message": "Gjøre Aktive Fanen.",
+    "message": "Fer que la pestanya es posi en primer pla.",
     "description": "Make Inspector tab active."
   },
   "autoCloseInspector": {
-    "message": "Lukk Automatisk.",
+    "message": "Tancar automàticament.",
     "description": "Auto close the Inspector."
   },
   "secondsBetweenInspectorChecks": {
-    "message": "Sjekk Intervall.",
+    "message": "Interval de comprovació.",
     "description": "Seconds between Inspector checks."
   },
   "debugging": {
-    "message": "Feilsøking",
+    "message": "Depuració",
     "description": "Debugging."
   },
   "showDebugWindow": {
-    "message": "Vis Debug-Vinduet.",
+    "message": "Mostrar la finestra de depuració.",
     "description": "Show debug window."
   },
   "save": {
-    "message": "Lagre",
+    "message": "Guardar",
     "description": "Save."
   },
   "openDevtools": {
-    "message": "Åpne DevTools",
+    "message": "Obrir DevTools",
     "description": "Open DevTools"
   },
   "addTab": {
-    "message": "Legg Til Fane",
+    "message": "Afegir pestanya",
     "description": "Add Tab"
   },
   "seconds": {
-    "message": "Sekunder",
+    "message": "Segons",
     "description": "Seconds badge label."
   },
   "localDevTools": {
-    "message": "Bruk Lokale DevTools.",
+    "message": "Emprar DevTools local.",
     "description": "Use local DevTools."
   },
   "autoIncrement": {
-    "message": "Auto Increment Vert/Port.",
+    "message": "Increment automàtic de Host/Port.",
     "description": "Auto increment host and/or port."
   }
 }

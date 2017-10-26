@@ -30,6 +30,7 @@ ngApp
         const UNINSTALL_URL = "http://june07.com/uninstall";
         const UPTIME_CHECK_RESOLUTION = 1000; // Check every second
         const DEVEL = false;
+        const IP_PATTERN = /(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
 
         $scope.loaded = Date.now();
         $scope.timerUptime= 0;
@@ -50,6 +51,7 @@ ngApp
                 showMessage: false,
                 lastHMAC: 0
             },
+            chromeNotifications: true,
             autoIncrement: {type: 'port', name: 'Port'} // both | host | port | false
         };
         $scope.notifications;
@@ -121,10 +123,12 @@ ngApp
                                 .then(function openDevToolsFrontend(json) {
                                     if (!json.data[0].devtoolsFrontendUrl) return callback(chrome.i18n.getMessage("errMsg7", [host, port]));
                                     var url = json.data[0].devtoolsFrontendUrl
-                                    .replace("127.0.0.1:9229", host + ":" + port)
-                                        .replace("localhost:9229", host + ":" + port)
-                                        .replace("127.0.0.1:" + port, host + ":" + port) // In the event that remote debugging is being used and the infoUrl port (by default 80) is not forwarded.
+                                    var inspectIP = url.match(IP_PATTERN)[0];
+                                    url = url
+                                        .replace("localhost:9229", host + ":" + port) // When localhost is being used, set the given host and port
                                         .replace("localhost:" + port, host + ":" + port)  // A check for just the port change must be made.
+                                        .replace(inspectIP + ":9229", host + ":" + port) // In the event that remote debugging is being used and the infoUrl port (by default 80) is not forwarded.
+                                        .replace(inspectIP + ":" + port, host + ":" + port) // A check for just the port change must be made.
                                     if ($scope.settings.localDevTools)
                                         url = url.replace('https://chrome-devtools-frontend.appspot.com', 'chrome-devtools://devtools/remote');
                                     var websocketId = json.data[0].id;
@@ -148,11 +152,10 @@ ngApp
                                         .then(callback);
                                     } else {
                                         // If the tab has focus then issue this... otherwise wait until it has focus (ie event listener for window event.  If another request comes in while waiting, just update the request with the new info but still wait if focus is not present.
-                                        var promiseToUpdateTabOrWindow = new Promise(function(resolve, reject) {
+                                        var promiseToUpdateTabOrWindow = new Promise(function(resolve) {
                                             chrome.tabs.query({
                                                 url: [ 'chrome-devtools://*/*', 'https://chrome-devtools-frontend.appspot.com/*' + host + ':' + port + '*' ]
                                             }, function callback(tab) {
-                                                if (tab.length === 0) return reject();
                                                 // Resolve otherwise let the event handler resolve
                                                 tab = tab[0];
                                                 if (tab.active) {
@@ -173,7 +176,7 @@ ngApp
                                 })
                                 .catch(function(error) {
                                     if (error.status === -1) {
-                                        var message = chrome.i18n.getMessage("errMsg4");
+                                        var message = chrome.i18n.getMessage("errMsg4"); // Connection to DevTools host was aborted.  Check your host and port.
                                         callback(message);
                                     } else {
                                         callback(error);
@@ -227,26 +230,19 @@ ngApp
                 clearInterval(timeout);
             }
             $scope.settings.checkIntervalTimeout = setInterval(function() {
-                $scope.devToolsSessions.forEach(function(devToolsSession, index) {
-                     if ($scope.settings.auto && ! isLocked(getInstance())) {
-                        if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
-                        closeDevTools(
-                        $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
-                            if ($scope.settings.debugVerbosity >= 3) console.log(message);
-                        }));
-                    } else if ($scope.settings.auto && isLocked(getInstance())) {
-                        /** If the isLocked(getInstance()) is set then we still have to check for disconnects on the client side via httpGetTest().
-                        until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
-                        that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
-                        */
-                        SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
-                    }
-                });
-                $scope.sessionlessTabs.forEach(function(sessionlessTab, index) {
-                    if (sessionlessTab.auto) {
-                        $scope.openTab(sessionlessTab.host, sessionlessTab.port, function() {});
-                    }
-                });
+                if ($scope.settings.auto && ! isLocked(getInstance())) {
+                    if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
+                    closeDevTools(
+                    $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
+                        if ($scope.settings.debugVerbosity >= 3) console.log(message);
+                    }));
+                } else if ($scope.settings.auto && isLocked(getInstance())) {
+                    /** If the isLocked(getInstance()) is set then we still have to check for disconnects on the client side via httpGetTest().
+                    until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
+                    that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
+                    */
+                    SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
+                }
             }, $scope.settings.checkInterval);
         }
         function httpGetTestSingleton() {
@@ -633,11 +629,6 @@ ngApp
                 tabId_HostPort_LookupTable[index] = { host: host, port: port, id: id };
             }
         }
-        $scope.saveSessionlessTabState = function(tabToSave) {
-            $scope.sessionlessTabs.find(function(tab, index, tabs) {
-                if (tab.id === tabToSave.id) return tabs.splice(index, 1, tab);
-            });
-        }
         function write(key, obj) {
             chrome.storage.sync.set({
                 [key]: obj
@@ -708,6 +699,14 @@ ngApp
         chrome.tabs.onActivated.addListener(function chromeTabsActivatedEvent(tabId) {
             resolveTabPromise(tabId);
         });
+        chrome.notifications.onButtonClicked.addListener(function chromeNotificationButtonClicked(notificationId, buttonIndex) {
+            if (buttonIndex === 0) {
+                $scope.settings.chromeNotifications = false;
+                $scope.save('chromeNotifications');
+            } else if (buttonIndex === 1) {
+                chrome.tabs.create({ url: 'chrome://extensions/configureCommands' });
+            }
+        });
         chrome.commands.onCommand.addListener(function chromeCommandsCommandEvent(command) {
             switch (command) {
                 case "open-devtools":
@@ -716,7 +715,21 @@ ngApp
                     $scope.openTab($scope.settings.host, $scope.settings.port, function (result) {
                         if ($scope.settings.debugVerbosity >= 3) console.log(result);
                     });
-                    $window._gaq.push(['_trackEvent', 'User Event', 'OpenDevTools', 'Keyboard Shortcut Used', undefined, true]); break;
+                    if ($scope.settings.chromeNotifications) {
+                        chrome.commands.getAll(function(commands) {
+                            var shortcut = commands[1];
+
+                            chrome.notifications.create('', {
+                                type: 'basic',
+                                iconUrl:  'icon/icon128.png',
+                                title: 'NiM owns the (' + shortcut.shortcut + ') shortcut.',
+                                message: '"' + shortcut.description + '"',
+                                buttons: [ { title: 'Disable this notice.' }, { title: 'Change the shortcut.' } ]
+                            },  function(notificationId) {});
+                        });
+                    }
+                    $window._gaq.push(['_trackEvent', 'User Event', 'OpenDevTools', 'Keyboard Shortcut Used', undefined, true]);
+                break;
             }
         });
     }]);
