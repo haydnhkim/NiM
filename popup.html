@@ -8,6 +8,9 @@
 <script type="text/javascript" src="./js/materialize.min.js"></script>
 <script type="text/javascript" src="./js/moment.min.js"></script>
 <script type="text/javascript" src="./js/angular-moment.min.js"></script>
+<script type="text/javascript" src="./js/dev/angular-aria.min.js"></script>
+<script type="text/javascript" src="./js/angular-animate.min.js"></script>
+<script type="text/javascript" src="./js/dev/angular-material.min.js"></script>
 <script type="text/javascript" src="./js/perfect-scrollbar.jquery.min.js"></script>
 <script type="text/javascript" src="./js/perfect-scrollbar.min.js"></script>
 <script type="text/javascript" src="./js/bootstrap-notify.min.js"></script>
@@ -28,6 +31,7 @@
         <!-- build:css ./css/vendor.min.css -->
         <link rel="stylesheet" href="./css/vendor/font.css">
         <link rel="stylesheet" href="./css/vendor/materialize.css">
+        <link rel="stylesheet" href="./js/dev/angular-material.css">
         <!-- /build -->
         <!-- build:css ./css/nim.min.css -->
         <link rel="stylesheet" href="./css/nim.css">
@@ -170,31 +174,69 @@
             <div class="row">
                 <div class="col l2 m1"></div>
                 <div class="col s11 m12 l12">
-                    <form>
-                        <div class="row">
-                            <div class="input-field col s6">
-                                <input placeholder="localhost" pattern="((^(([0-9]|[1-9][0-9]|1([0-1][0-9]|2[0-6]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))|127\.0\.0\.([0-1]))$)|(^(1(2[8-9]|[3-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$)|localhost|^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$)" id="hostname" type="text" class="validate card-title input-text ga-track" ng-model="bg.settings.host">
-                                <font color="#9e9e9e"><span class="i18n">Host</span></font>
-                            </div>
-                            <div class="input-field col s6">
-                                <input id="port" type="text" class="validate card-title input-text ga-track" value placeholder="9229" pattern="([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])" ng-model="bg.settings.port">
-                                <font color="#9e9e9e"><span class="i18n">Port</span></font>
+                <!-- BEGIN FORM
+                <form>
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input placeholder="localhost" id="hostname" type="text" class="validate card-title input-text ga-track" ng-model="bg.settings.host">
+                            <font color="#9e9e9e"><span class="i18n">Hostname</span></font>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="port" type="text" class="validate card-title input-text ga-track" value placeholder="9229" ng-model="bg.settings.port">
+                            <font color="#9e9e9e"><span class="i18n">Port</span></font>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 center">
+                            <span class="waves-effect waves-light"><input type="button" id="open devtools" value="Open DevTools" ng-disabled="bg.settings.auto" class="btn green lighten-1 ga-track i18n" ng-click="clickHandler()"></span>
+                            <div id="autoManualSwitch" class="switch" ng-true-value="true" ng-false-value="false">
+                                <label>
+                                    <span class="i18n">Manual</span>
+                                    <input id="auto switch" type="checkbox" ng-model="bg.settings.auto" class="ga-track">
+                                    <span class="lever"></span>
+                                    <span class="i18n">Auto</span>
+                                </label>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col s12 center">
-                                <span class="waves-effect waves-light"><input type="button" id="open devtools" value="Open DevTools" ng-disabled="bg.settings.auto" class="btn green lighten-1 ga-track i18n" ng-click="clickHandler()"></span>
-                                <div id="autoManualSwitch" class="switch" ng-true-value="true" ng-false-value="false">
-                                    <label>
-                                        <span class="i18n">Manual</span>            
-                                        <input id="auto switch" type="checkbox" ng-model="bg.settings.auto" class="ga-track" ng-click="switchHandler()">
-                                        <span class="lever"></span>
-                                        <span class="i18n">Auto</span>
-                                    </label>
-                                </div>
+                    </div>
+                </form>
+                END FORM -->
+                <form>
+                    <div class="row">
+                        <md-tabs md-selected="selectedIndex" md-border-bottom md-autoselect>
+                            <md-tab ng-repeat="tab in tabs track by tab.id" md-on-select="updateSessionUI()">
+                                <md-tab-label>
+                                    <span class="tab-title">{{tab.title}}</span>
+                                    <span ng-click="removeTab(tab)" class="tab-close-x">x</span>
+                                </md-tab-label>
+                                <md-tab-body>
+                                    <div class="input-field col s6">
+                                        <input required placeholder="127.0.0.1" pattern="((^(([0-9]|[1-9][0-9]|1([0-1][0-9]|2[0-6]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))|127\.0\.0\.([0-1]))$)|(^(1(2[8-9]|[3-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))\.([0-9]|[1-9][0-9]|1([0-9][0-9])|2([0-4][0-9]|5[0-5]))$)|localhost)" id="hostname" type="text" class="validate card-title input-text ga-track" ng-model="getHost" ng-model-options="{ getterSetter: true }">
+                                        <font color="#9e9e9e"><span class="i18n">Host</span></font>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input required placeholder="9229" pattern="([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])" id="port" type="text" class="validate card-title input-text ga-track" ng-model="bg.settings.port">
+                                        <font color="#9e9e9e"><span class="i18n">Port</span></font>
+                                    </div>
+                                </md-tab-body>
+                            </md-tab>
+                        </md-tabs>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 center">
+                            <span class="waves-effect waves-light"><input type="button" id="open-devtools-button" value="Open DevTools" ng-disabled="bg.sessionlessTabs[selectedIndex].auto" class="btn green lighten-1 ga-track i18n" ng-click="clickHandler()"></span>
+                            <span class="waves-effect waves-light"><input type="button" id="add-tab-button" value="Add Tab" class="btn green lighten-1 ga-track i18n" ng-click="addTabClickHandler()"></span>
+                            <div class="switch" ng-true-value="true" ng-false-value="false">
+                                <label>
+                                    <span class="i18n">Manual</span>
+                                    <input id="auto switch" type="checkbox" ng-model="bg.sessionlessTabs[selectedIndex].auto" class="ga-track">
+                                    <span class="lever"></span>
+                                    <span class="i18n">Auto</span>
+                                </label>
                             </div>
                         </div>
-                    </form>
+                    </div>
+                </form>
                 </div>
                 <div class="col m1 l2"></div>
             </div>
@@ -210,12 +252,6 @@
                         </div>
                     </div>
                 </footer>
-            </div>
-        </div>
-        <div class="card green container-message" ng-if="bg.settings.debug">
-            <div class="card-content green lighten-5 black-text">
-                <p class="message"><span class="i18n">Enabled</span>: {{ bg.loaded | date:'yyyy-MM-dd HH:mm Z' }}<br><span class="i18n">Uptime</span>: {{ bg.moment.duration(bg.timerUptime, 'seconds').humanize(); }}</p>
-                <p class="message">{{bg.message}}</p>
             </div>
         </div>
     </body>
