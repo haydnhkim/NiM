@@ -39,7 +39,7 @@ This project is open source and available at https://github.com/june07/NiM.
 
 [0.14.2] - 2017-10-26
 Fixed
-- Forgot to update locales during GitHub Issue #32fix push.
+- Forgot to update locales during GitHub Issue #32fix  push.
 [0.14.1] - 2017-10-23
 Changed
 - Renamed "Hostname" label on popup to "Host" to more accurately represent the data field.  Also added/changed the regexp to match and validate data.

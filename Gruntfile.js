@@ -74,7 +74,7 @@ module.exports = function (grunt) {
         main: {
           files: [{
               expand: true,
-              src: ['js/**/*.js', '*.js', '*.html', 'css/**/*.css', '*.css', 'icon/*', 'font/*', 'image/*', 'manifest.json', 'LICENSE', '_locales/**/*', '!Gruntfile.js', '!i18n_config.js', '!notifications*.js'],
+              src: ['js/**/*.js', '*.js', '*.html', 'css/**/*.css', '*.css', 'icon/*', 'font/*', 'image/*', 'manifest.json', 'LICENSE', '_locales/**/*', '!js/dev/**',  '!Gruntfile.js', '!i18n_config.js', '!notifications*.js'],
               dest: 'build/unpacked-dev/' },
           { expand: true,
             cwd: 'css/vendor/',
