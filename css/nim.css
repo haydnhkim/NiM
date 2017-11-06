@@ -191,8 +191,8 @@ label {
     margin-left: 15px;
 }
 
-.row-footer {
-    margin-bottom: 0px;
+.row {
+    margin-bottom: 44px;
 }
 
 .animate-show.ng-hide-add,
@@ -416,16 +416,26 @@ md-tab-item:nth-child(8) {
     background-color: #81c784 /* green lighten-2 */
 }
 
-
+.md-tab {
+    padding: 0px 5px;
+    width: 125px;
+}
 .md-ripple-container {
     color: #4CAF50;
 }
 md-tab-item {
     background-color: #eee;
 }
+md-tabs-canvas {
+    height: 20px;
+}
+md-tabs[md-border-bottom]:not(.md-dynamic-height) md-tabs-content-wrapper {
+    top: 20px;
+}
 md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
     color: #4CAF50;
     background: #4CAF50;
+    bottom: unset;
 }
 .tab-close-x {
     min-width: 0px !important;
@@ -436,6 +446,12 @@ md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
 }
 md-tab-content {
   transition: opacity .25s linear;
+}
+.md-truncate {
+    max-width: 50px;
+}
+body > div.container.container-page > div:nth-child(2) > div.col.s11.m12.l12 > form > div:nth-child(1) {
+    height: 150px;
 }
 .tab-title {
     text-transform: none;

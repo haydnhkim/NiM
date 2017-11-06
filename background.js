@@ -28,9 +28,133 @@ ngApp
         const VERSION = ''; // Filled in by Grunt
         const UPTIME_CHECK_INTERVAL = 60 * 15; // 15 minutes                                                                       
         const UNINSTALL_URL = "http://june07.com/uninstall";
+        const INSTALL_URL = "http://june07.com/blog/nim-install";
         const UPTIME_CHECK_RESOLUTION = 1000; // Check every second
         const DEVEL = false;
         const IP_PATTERN = /(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
+
+$scope.scan = true;
+$scope.connections = [];
+
+// Init  array with range of ports to scan.
+var portRange = (function() {
+    var startPort = 63822,
+        endPort = 63922,
+        portRange = [];
+
+        for (var i = startPort; i <= endPort; i++) portRange.push({ port: i});
+        return portRange;
+})();
+$scope.Tab = Tab;
+ function Tab(config) {
+          var self = this;
+          if (config === undefined) config = { title: 'localhost:9229' };
+          self.id = uuid();
+          self.order = config.order || null;
+          self.title = config.title;
+          self.session = config.session || null;
+          self.disabled = config.disabled || false;
+          self.auto = false;
+
+          if (self.session && !self.title) {
+            self.title = parseHostPortFromInfoURL(self.session.infoUrl);
+          }
+          function parseHostPortFromInfoURL(infoURL) {
+            // 'http://' + $scope.settings.host + ':' + $scope.settings.port + '/json'
+            return infoURL.split('http://')[1].split('/json')[0];
+          }
+          self.getHost = function() {
+            return self.title.split(":")[0];
+          }
+          self.getPort = function() {
+            return self.title.split(":")[1];
+          }
+          self.host = (function() {
+            return self.title.split(":")[0];
+          })();
+          self.port = (function() {
+            return self.title.split(":")[1];
+          })();
+          function uuid() {
+            var uuid = "", i, random;
+            for (i = 0; i < 32; i++) {
+              random = Math.random() * 16 | 0;
+
+              if (i == 8 || i == 12 || i == 16 || i == 20) {
+                uuid += "-"
+              }
+              uuid += (i == 12 ? 4 : (i == 16 ? (random & 3 | 8) : random)).toString(16);
+            }
+            return uuid;
+          }
+          return self;
+        }
+function scan() {
+    if ($scope.scanning) return;
+    $scope.scanning = true;
+    $scope.starttime = new Date();
+    async.mapLimit(portRange, 100, function(item, callback) {
+        var xhr = new XMLHttpRequest() ;
+        //xhr.timeout = 1000;
+        xhr.open("GET", "http://localhost:" + item.port  + "/json", true);
+        xhr.onload = function(event) {
+            if (event.target.status === 200) {
+               callback(null, { host: 'localhost', port: item.port, xhr: xhr });
+            } else {
+                callback('Error: ');
+            }
+        }
+            xhr.onerror = function(event) { callback(null); };
+            xhr.ontimeout = function(event) { callback(null); };
+        xhr.send();
+    }, function(err, result) {
+        $scope.connections = result.filter(function(resultItem) {
+            if (resultItem !== undefined) return resultItem;
+        });
+        $scope.endtime = new Date();
+        if ($scope.settings.debugVerbosity >= 6) console.log('Detected ' + $scope.connections.length + ' connections during this scan interval.');
+         if ($scope.settings.debugVerbosity >= 6) console.log('Scan began at: ' + $scope.starttime);
+         if ($scope.settings.debugVerbosity >= 6) console.log('Scan ended at: ' + $scope.endtime);
+         if ($scope.settings.debugVerbosity >= 6) console.dir($scope.connections);
+         $scope.connections.forEach(function(connection) {
+            $scope.sessionlessTabs.push(new Tab({ title: connection.host + ":" + connection.port }));
+         })
+         $scope.scanning = false;
+    });
+}
+setInterval(function() { scan(); }, 10000);
+/*
+var gen = scanner();
+gen.next();
+
+function* scanner() {
+    var port  = 9229;
+    while (true) {
+        $scope.connections[port] = { port: port, xhr: new XMLHttpRequest() };
+
+        (function uniq() {
+            var connection = $scope.connections[port];            
+            var xhr = connection.xhr;
+            xhr.timeout = 100;
+            xhr.open("GET", "http://localhost:" + connection.port  + "/json", true);
+            xhr.onload = function(event) {
+                if (event.target.status === 200) {
+                    xhr.abort();
+                    $scope.connections[connection.port].inspectorListening = true;
+                }
+            }
+                xhr.send();
+        })();
+
+        port++;
+        if (port === 10229) {
+            port = 9229;
+            yield setTimeout(function() {
+               gen.next();
+            }, 10000)
+        }
+    }
+}*/
 
         $scope.loaded = Date.now();
         $scope.timerUptime= 0;
@@ -58,7 +182,19 @@ ngApp
         $scope.devToolsSessions = [];
         $scope.changeObject;
         $scope.userInfo;
-        $scope.sessionlessTabs = [];
+       // $scope.sessionlessTabs = [];
+       function SessionlessTabs() {
+           this.SessionlessTabs = function() {
+                return this;
+            };
+            this.push = function(newItem) {
+                if (this.find(function(item) {
+                    if (newItem.toLowerCase().title === item.toLowerCase().title)  return true;
+                }) === undefined) Array.prototype.push.call(newItem);
+            }
+        }
+        SessionlessTabs.prototype  = Object.create(Array.prototype);
+        $scope.sessionlessTabs  = new SessionlessTabs();
         $scope.locks = [];
         $scope.moment = $window.moment;
 
@@ -230,19 +366,26 @@ ngApp
                 clearInterval(timeout);
             }
             $scope.settings.checkIntervalTimeout = setInterval(function() {
-                if ($scope.settings.auto && ! isLocked(getInstance())) {
-                    if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
-                    closeDevTools(
-                    $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
-                        if ($scope.settings.debugVerbosity >= 3) console.log(message);
-                    }));
-                } else if ($scope.settings.auto && isLocked(getInstance())) {
-                    /** If the isLocked(getInstance()) is set then we still have to check for disconnects on the client side via httpGetTest().
-                    until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
-                    that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
-                    */
-                    SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
-                }
+                $scope.devToolsSessions.forEach(function(devToolsSession, index) {
+                    if ($scope.settings.auto && ! isLocked(getInstance())) {
+                        if ($scope.settings.debugVerbosity >= 6) console.log('resetInterval going thru a check loop...')
+                        closeDevTools(
+                        $scope.openTab($scope.settings.host, $scope.settings.port, function(message) {
+                            if ($scope.settings.debugVerbosity >= 3) console.log(message);
+                        }));
+                    } else if ($scope.settings.auto && isLocked(getInstance())) {
+                        /** If the isLocked(getInstance()) is set then we still have to check for disconnects on the client side via httpGetTest().
+                        until there exists an event for the DevTools websocket disconnect.  Currently there doesn't seem to be one
+                        that we can use simultanous to DevTools itself as only one connection to the protocol is allowed at a time.
+                        */
+                        SingletonHttpGet.getInstance({ host: $scope.settings.host, port: $scope.settings.port });
+                    }
+                });
+                $scope.sessionlessTabs.forEach(function(sessionlessTab, index) {
+                    if (sessionlessTab.auto) {
+                        $scope.openTab(sessionlessTab.host, sessionlessTab.port, function() {});
+                    }
+                });
             }, $scope.settings.checkInterval);
         }
         function httpGetTestSingleton() {
@@ -629,6 +772,11 @@ ngApp
                 tabId_HostPort_LookupTable[index] = { host: host, port: port, id: id };
             }
         }
+        $scope.saveSessionlessTabState = function(tabToSave) {
+            $scope.sessionlessTabs.find(function(tab, index, tabs) {
+                if (tab.id === tabToSave.id) return tabs.splice(index, 1, tab);
+            });
+        }
         function write(key, obj) {
             chrome.storage.sync.set({
                 [key]: obj
@@ -665,6 +813,9 @@ ngApp
             if (chrome.runtime.lastError) {
                 if ($scope.settings.debugVerbosity >= 5) console.log(chrome.i18n.getMessage("errMsg1") + UNINSTALL_URL);
             }
+        });
+        chrome.runtime.onInstalled.addListener(function installed() {
+                chrome.tabs.create({ url: INSTALL_URL});
         });
         chrome.identity.getProfileUserInfo(function(userInfo) {
             //

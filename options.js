@@ -26,12 +26,6 @@ ngApp
     .controller('nimOptionsController', ['$scope', '$window', function($scope, $window) {
         $scope.bg = $window.chrome.extension.getBackgroundPage().angular.element('#nim').scope();
         $scope.bg.localize($window, function() {});
-        $scope.autoIncrementOptions = [
-            {id: 'both', name: 'Both'},
-            {id: 'host', name: 'Host'},
-            {id: 'port', name: 'Port'},
-            {id: 'false', name: 'False'},
-        ];
 
         var $ = $window.$;
 

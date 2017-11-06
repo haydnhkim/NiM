@@ -21,7 +21,7 @@
  *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *    SOFTWARE.
 */
-var ngApp = angular.module('NimPopupApp', ['angularMoment']);
+var ngApp = angular.module('NimPopupApp', ['angularMoment', 'ngMaterial']);
 ngApp
     .filter('stringLimit', ['$filter', function($filter) {
        return function(input, limit, ellipses) {
@@ -47,10 +47,120 @@ ngApp
         $scope.bg.localize($window, function() {});
         $scope.yieldResult = "wait";
         $scope.messageModalState = "closed";
-
+        $scope.tabs = [];
+        $scope.selectedIndex = 0;
         var  chrome = $window.chrome,
           $ = $window.$;
         
+         $scope.getHost = function(newHost) {
+          return arguments.length ? ($scope.bg.settings.host = newHost) : $scope.bg.settings.host;
+        };
+        
+        function regenerateTabs(recursion) {
+          $scope.tabs = [];
+          var p1, p2;
+          
+          p1 = new Promise(function(resolve, reject) {
+            $scope.bg.devToolsSessions.forEach(function(session, i, array) {
+              addTab(new $scope.bg.Tab({ session: session }));
+              if (array.length() === i-1) resolve();
+            });
+          });
+          p2 = new Promise(function(resolve, reject) {
+            $scope.bg.sessionlessTabs.forEach(function(sessionlessTab, i, array) {     
+              addTab(sessionlessTab);
+              if (array.length() === i-1) resolve();
+            });
+          });
+          Promise.all([p1, p2])
+          .then(function() {
+            if ($scope.tabs.length === 0) {
+              $scope.bg.sessionlessTabs.push(new $scope.bg.Tab());
+              if (recursion === undefined) regenerateTabs(1);
+            }
+          });
+        }
+        $scope.$watch('bg.devToolsSessions', function() {
+          regenerateTabs();
+        });
+        $scope.$watch('bg.sessionlessTabs', function() {
+          regenerateTabs();
+        });
+        function addTab(tab) {
+          tab.order = $scope.tabs.length;
+          $scope.tabs.push(tab);
+        }
+        $scope.addTab = function() {
+          incrementTarget($scope.bg.settings.autoIncrement.type, function(host, port) {
+            $scope.bg.sessionlessTabs.push(new $scope.bg.Tab({ title: host + ":" + port }));
+            regenerateTabs();
+          });
+        }
+        function incrementTarget(target, callback) {
+          var newHost = $scope.bg.settings.host,
+            newPort = $scope.bg.settings.port;
+          switch (target) {
+            case 'port':
+              portCase(); break;
+            case 'ip':
+              hostCase(); break;
+            case 'both':
+              hostCase();
+              portCase(); break;
+            default: break;
+          }
+          function hostCase() {
+            var octets = $scope.bg.settings.host.split(".");
+            for (var index = 1; index < 5; index++) {
+              octets[octets.length-index] = parseInt(octets[octets.length-index]);
+            }
+            octets.every(function(octet, index, octets) {
+              var endIndex = octets.length-1,
+                done;
+              if (octets[endIndex] <= 253) {
+                octets[endIndex] = octets[endIndex] + 1; done = true;
+              } else {
+                octets[endIndex] = 1;
+              }
+              if ((index === octets.length-1) || done) {
+                if (octets[0] === 0) newHost = "Pick a different subnet.  You seem to be out of addresses.";
+                else newHost = octets[0] +"."+ octets[1] +"."+ octets[2] +"."+ octets[3];
+                return;
+              }
+            });
+          }
+          function portCase() {
+            newPort = parseInt($scope.bg.settings.port) + 1;
+          }
+          callback(newHost, newPort);
+        }
+        $scope.updateSessionUI = function() {
+          $scope.bg.settings.host = $scope.tabs[$scope.selectedIndex].host;
+          $scope.bg.settings.port = $scope.tabs[$scope.selectedIndex].port;
+          $scope.bg.settings.auto = $scope.tabs[$scope.selectedIndex].auto;
+        }
+        $scope.$watch('bg.settings.host', function() {
+           if ($scope.tabs.length <= 0) return;
+          $scope.tabs[$scope.selectedIndex].title = ($scope.bg.settings.host ? $scope.bg.settings.host : '0.0.0.0') + ":" + ($scope.bg.settings.port ? $scope.bg.settings.port : '0');
+          $scope.bg.saveSessionlessTabState($scope.tabs[$scope.selectedIndex]);
+        });
+        $scope.$watch('bg.settings.port', function() {
+          if ($scope.tabs.length <= 0) return;
+          $scope.tabs[$scope.selectedIndex].title = ($scope.bg.settings.host ? $scope.bg.settings.host : '0.0.0.0') + ":" + ($scope.bg.settings.port ? $scope.bg.settings.port : '0');
+          $scope.bg.saveSessionlessTabState($scope.tabs[$scope.selectedIndex]);
+        });
+        $scope.$watch('bg.sessionlessTabs['+$scope.selectedIndex+'].auto', function() {
+          $scope.bg.saveSessionlessTabState($scope.tabs[$scope.selectedIndex]);
+        });
+        
+        $scope.removeTab = function (tabToRemove) {
+          $scope.bg.sessionlessTabs.find(function(tab, index) {
+            if (tab.id === tabToRemove.id) return $scope.bg.sessionlessTabs.splice(index, 1);
+          })
+          $scope.selectedIndex = Math.max(0, $scope.selectedIndex--);
+          regenerateTabs();
+        };
+
         $scope.openModal = function() {
           $.notify.close();
           $scope.pn.next("wait");
@@ -63,13 +173,16 @@ ngApp
                 else
                   $scope.message = result;
             });
-        };
+        }
+         $scope.addTabClickHandler = function() {
+          $scope.addTab();
+        }
         $scope.switchHandler = function() {
             $scope.bg.save("auto");
         }
         $scope.track = function (url) {
             $window._gaq.push(['_trackPageview', url]);
-        };
+        }
         function showErrorMessage(error) {
           $window.document.querySelector('#site-href').style.display = "none";
           $window.Materialize.toast(error, 5000);
