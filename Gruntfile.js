@@ -10,7 +10,6 @@ module.exports = function (grunt) {
   };
   var jsDeps = [
               'angular.min.js',
-              'angular-animate.min.js',
               'angular-moment.min.js',
               'bootstrap-notify.min.js',
               'jquery.min.js',
@@ -19,10 +18,10 @@ module.exports = function (grunt) {
               'nouislider.min.js',
               'perfect-scrollbar.jquery.min.js',
               'perfect-scrollbar.min.js',
-              'wnumb.js'
+              'wNumb.js'
   ];
   jsDeps;
-  fileMaps.uglify['build/unpacked-prod/js/wnumb.min.js'] = 'build/unpacked-dev/js/wnumb.js';
+  fileMaps.uglify['build/unpacked-prod/js/wNumb.min.js'] = 'build/unpacked-dev/js/wNumb.js';
   fileMaps.uglify['build/unpacked-prod/js/googleanalytics.min.js'] = 'build/unpacked-dev/js/googleanalytics.js';
   fileMaps.uglify['build/unpacked-prod/background.min.js'] = 'build/unpacked-dev/background.js';
   fileMaps.uglify['build/unpacked-prod/popup.min.js'] = 'build/unpacked-dev/popup.js';
@@ -196,7 +195,6 @@ module.exports = function (grunt) {
           files: {
               // Target-specific file lists and/or options go here 
               'angular.min.js': 'angular/angular.min.js',
-              'angular-animate.min.js': 'angular-animate/angular-animate.min.js',
               'angular-moment.min.js': 'angular-moment/angular-moment.min.js',
               'bootstrap-notify.min.js': 'bootstrap-notify/bootstrap-notify.min.js',
               'jquery.min.js': 'jquery/dist/jquery.min.js',
@@ -217,7 +215,6 @@ module.exports = function (grunt) {
               // Target-specific file lists and/or options go here
               'materialize.css': 'materialize-css/dist/css/materialize.css',
               'options/nouislider.css': 'nouislider/distribute/nouislider.css',
-              'popup/animate.min.css': 'animate.css/animate.min.css',
               'popup/bootstrap.min.css': 'bootstrap/dist/css/bootstrap.min.css',
               'popup/perfect-scrollbar.css': 'perfect-scrollbar/dist/css/perfect-scrollbar.css',
           }
