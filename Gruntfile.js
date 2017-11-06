@@ -140,9 +140,9 @@ module.exports = function (grunt) {
         },
         dist: {
           files: [
-            { 'build/unpacked-dev/background.js': 'background.js' }, 
-            { 'build/unpacked-dev/popup.js': 'popup.js' },
-            { 'build/unpacked-dev/options.js': 'options.js' }
+            { 'build/unpacked-dev/background.js': 'build/unpacked-dev/background.js' }, 
+            { 'build/unpacked-dev/popup.js': 'build/unpacked-dev/popup.js' },
+            { 'build/unpacked-dev/options.js': 'build/unpacked-dev/options.js' }
           ]
         }
       },
@@ -161,23 +161,20 @@ module.exports = function (grunt) {
           ]
         }
       },
-      'string-replace': {
+      'replace': {
         dist: {
-          files: {
-            'build/unpacked-dev/': 'background.js',
+          src: ['build/unpacked-dev/background.js'],
+          overwrite: true,
+          replacements: [{
+            from: /const VERSION \= \'\'/,
+            to: 'const VERSION = \''+ pkg.version +'\''
           },
-          options: {
-            replacements: [{
-              pattern: /const VERSION \= \'\'/,
-              replacement: 'const VERSION = \''+ pkg.version +'\''
-            },
-            { pattern: /debugVerbosity: [0-9]/,
-              replacement: 'debugVerbosity: 0'
-            },
-            { pattern: /const DEVEL \= true/,
-              replacement: 'const DEVEL = false'
-            }]
-          }
+          { from: /debugVerbosity: [0-9]/,
+            to: 'debugVerbosity: 0'
+          },
+          { from: /const DEVEL \= true/,
+            to: 'const DEVEL = false'
+          }]
         }
       },
       watch: {
@@ -246,8 +243,8 @@ module.exports = function (grunt) {
   );
   grunt.registerTask('test', ['eslint']);
   grunt.registerTask('test-cont', ['test', 'watch']);
-  grunt.registerTask('default', ['clean', 'npmcopy', 'test', 'mkdir:unpacked', 'copy:main', 'manifest', 'mkdir:js', 'string-replace', 'processhtml:dist', 'processhtml:min', 'cssmin', 'babel', 'uglify', 'copy:min', 'exec:crx', 'compress']);
-  grunt.registerTask('defaultosx', ['clean', 'npmcopy', 'test', 'mkdir:unpacked', 'copy:main', 'manifest', 'mkdir:js', 'string-replace', 'processhtml:dist', 'processhtml:min', 'cssmin', 'babel', 'uglify', 'copy:min', 'exec:crxosx', 'compress']);
+  grunt.registerTask('default', ['clean', 'npmcopy', 'test', 'mkdir:unpacked', 'copy:main', 'manifest', 'mkdir:js', 'replace:dist', 'processhtml:dist', 'processhtml:min', 'cssmin', 'babel', 'uglify', 'copy:min', 'exec:crx', 'compress']);
+  grunt.registerTask('defaultosx', ['clean', 'npmcopy', 'test', 'mkdir:unpacked', 'copy:main', 'manifest', 'mkdir:js', 'replace:dist', 'processhtml:dist', 'processhtml:min', 'cssmin', 'babel', 'uglify', 'copy:min', 'exec:crxosx', 'compress']);
   grunt.file.write('build/unpacked-dev/manifest.json', JSON.stringify(mnf, null, 4) + '\n');
   grunt.log.ok('manifest.json generated');
 }
