@@ -61,15 +61,18 @@ ngApp
           var p1, p2;
           
           p1 = new Promise(function(resolve, reject) {
+            if ($scope.bg.devToolsSessions.length === 0) resolve();
             $scope.bg.devToolsSessions.forEach(function(session, i, array) {
               addTab(new $scope.bg.Tab({ session: session }));
-              if (array.length() === i-1) resolve();
+              if (array.length === i-1) resolve();
             });
           });
           p2 = new Promise(function(resolve, reject) {
+
+            if ($scope.bg.sessionlessTabs.length === 0) resolve();
             $scope.bg.sessionlessTabs.forEach(function(sessionlessTab, i, array) {     
               addTab(sessionlessTab);
-              if (array.length() === i-1) resolve();
+              if (array.length === i-1) resolve();
             });
           });
           Promise.all([p1, p2])

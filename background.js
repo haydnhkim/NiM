@@ -37,14 +37,15 @@ $scope.scan = true;
 $scope.connections = [];
 
 // Init  array with range of ports to scan.
-var portRange = (function() {
-    var startPort = 63822,
-        endPort = 63922,
-        portRange = [];
-
-        for (var i = startPort; i <= endPort; i++) portRange.push({ port: i});
+$scope.setScanRange = function(startPort, numOfPortsToScan) {
+    this.startPort = startPort || 9229;
+    this.numOfPortsToScan = numOfPortsToScan || 100;
+    var endPort = this.startPort + this.numOfPortsToScan;
+    var portRange = [];
+    for (var i = this.startPort; i <= endPort; i++) portRange.push({ port: i});
         return portRange;
-})();
+}
+var portRange = $scope.setScanRange();
 $scope.Tab = Tab;
  function Tab(config) {
           var self = this;
@@ -123,38 +124,6 @@ function scan() {
     });
 }
 setInterval(function() { scan(); }, 10000);
-/*
-var gen = scanner();
-gen.next();
-
-function* scanner() {
-    var port  = 9229;
-    while (true) {
-        $scope.connections[port] = { port: port, xhr: new XMLHttpRequest() };
-
-        (function uniq() {
-            var connection = $scope.connections[port];            
-            var xhr = connection.xhr;
-            xhr.timeout = 100;
-            xhr.open("GET", "http://localhost:" + connection.port  + "/json", true);
-            xhr.onload = function(event) {
-                if (event.target.status === 200) {
-                    xhr.abort();
-                    $scope.connections[connection.port].inspectorListening = true;
-                }
-            }
-                xhr.send();
-        })();
-
-        port++;
-        if (port === 10229) {
-            port = 9229;
-            yield setTimeout(function() {
-               gen.next();
-            }, 10000)
-        }
-    }
-}*/
 
         $scope.loaded = Date.now();
         $scope.timerUptime= 0;
@@ -189,8 +158,8 @@ function* scanner() {
             };
             this.push = function(newItem) {
                 if (this.find(function(item) {
-                    if (newItem.toLowerCase().title === item.toLowerCase().title)  return true;
-                }) === undefined) Array.prototype.push.call(newItem);
+                    if (newItem.title.toLowerCase() === item.title.toLowerCase())  return true;
+                }) === undefined) Array.prototype.push.call(this, newItem);
             }
         }
         SessionlessTabs.prototype  = Object.create(Array.prototype);
