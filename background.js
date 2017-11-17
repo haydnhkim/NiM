@@ -38,7 +38,7 @@ ngApp
         $scope.settings = {
             host: "localhost",
             port: "9229",
-            auto: true,
+            auto: false,
             checkInterval: 500,
             debugVerbosity: 9,
             checkIntervalTimeout: null,
