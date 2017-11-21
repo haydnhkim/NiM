@@ -30,7 +30,7 @@ ngApp
         const UNINSTALL_URL = "http://june07.com/uninstall";
         const INSTALL_URL = "http://june07.com/blog/nim-install";
         const UPTIME_CHECK_RESOLUTION = 1000; // Check every second
-        const DEVEL = false;
+        const DEVEL = true;
         const IP_PATTERN = /(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
 
 $scope.scan = true;
@@ -845,7 +845,7 @@ setInterval(function() { scan(); }, 10000);
                                 title: 'NiM owns the (' + shortcut.shortcut + ') shortcut.',
                                 message: '"' + shortcut.description + '"',
                                 buttons: [ { title: 'Disable this notice.' }, { title: 'Change the shortcut.' } ]
-                            },  function(notificationId) {});
+                            },  function() {});
                         });
                     }
                     $window._gaq.push(['_trackEvent', 'User Event', 'OpenDevTools', 'Keyboard Shortcut Used', undefined, true]);
